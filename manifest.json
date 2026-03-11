@@ -1,21 +1,25 @@
 {
   "name": "Mentis Habits",
-  "short_name": "Habits",
-  "start_url": "./index.html",
+  "short_name": "Mentis Habits",
+  "lang": "pt-PT",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#061228",
-  "theme_color": "#16a34a",
+  "background_color": "#0b1220",
+  "theme_color": "#0b1220",
+  "description": "App PWA de hábitos simples e elegante para uso diário.",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "./icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "icon-512.png",
+      "src": "./icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
