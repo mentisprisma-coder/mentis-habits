@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mentis-habits-v1';
+const CACHE_NAME = 'mentis-habits-v3';
 const ASSETS = [
   './',
   './index.html',

@@ -80,6 +80,7 @@
     .brand small{
       color:var(--muted);
       font-size:.84rem;
+      text-transform:capitalize;
     }
     .top-actions{
       display:flex;
@@ -105,6 +106,38 @@
     }
     .page.active{display:block}
     @keyframes fade{from{opacity:.4;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+    .summary-box{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:12px;
+      background:var(--surface);
+      border:1px solid var(--line);
+      border-radius:24px;
+      padding:14px;
+      box-shadow:var(--shadow);
+      margin:4px 0 14px;
+    }
+    .metric{
+      background:var(--surface-2);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:14px 12px;
+      min-height:96px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap:6px;
+    }
+    .metric strong{
+      font-size:1.5rem;
+      letter-spacing:-0.04em;
+      line-height:1;
+    }
+    .metric span{
+      color:var(--muted);
+      font-size:.86rem;
+    }
 
     .section-title{
       display:flex;
@@ -186,7 +219,8 @@
       border-radius:999px;
     }
     .card-actions{
-      display:flex;
+      display:grid;
+      grid-template-columns:repeat(2, 38px);
       gap:8px;
       flex:none;
     }
@@ -236,17 +270,41 @@
       border-radius:12px;
       border:1px solid var(--line);
       background:var(--surface);
-      color:var(--muted);
+      color:transparent;
       cursor:pointer;
       display:grid;place-items:center;
       font-weight:700;
       transition:all .18s ease;
+      position:relative;
+    }
+    .check::before{
+      content:"";
+      width:16px;
+      height:16px;
+      border-radius:4px;
+      border:2px solid var(--muted);
+      opacity:.72;
+      transition:all .18s ease;
+      background:transparent;
     }
     .check.on{
       background:var(--primary-soft);
-      color:var(--primary);
       border-color:transparent;
       transform:translateY(-1px);
+    }
+    .check.on::before{
+      width:16px;
+      height:16px;
+      border-radius:4px;
+      border:none;
+      background:var(--primary);
+      opacity:1;
+      content:"✓";
+      display:grid;
+      place-items:center;
+      color:#fff;
+      font-size:.78rem;
+      font-weight:900;
     }
     .note{
       margin-top:12px;
@@ -451,6 +509,8 @@
     @media (max-width:420px){
       .row-2{grid-template-columns:1fr}
       .brand h1{font-size:1.28rem}
+      .card-actions{grid-template-columns:repeat(2, 36px)}
+      .mini-btn{width:36px;height:36px}
     }
   </style>
 </head>
@@ -469,6 +529,16 @@
 
     <main>
       <section class="page active" id="page-hoje">
+        <div class="summary-box">
+          <div class="metric">
+            <strong id="metricHabits">0</strong>
+            <span>Hábitos criados</span>
+          </div>
+          <div class="metric">
+            <strong id="metricCompletion">0%</strong>
+            <span>Conclusão do dia</span>
+          </div>
+        </div>
         <div class="section-title">
           <h2>Hoje</h2>
           <div class="pill" id="summaryPill">0 hábitos</div>
@@ -543,7 +613,7 @@
               <strong>App</strong><br />
               <small style="color:var(--muted)">Mentis Habits · PWA</small>
             </div>
-            <span class="pill">v1.0</span>
+            <span class="pill">v1.2</span>
           </div>
           <div class="setting-line">
             <div>
@@ -575,7 +645,8 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'mentis-habits-data-v1';
+    const STORAGE_KEY = 'mentis-habits-data-v2';
+    const LEGACY_STORAGE_KEY = 'mentis-habits-data-v1';
     const THEME_KEY = 'mentis-habits-theme';
     const categories = {
       saude: { label: 'Saúde', icon: '❤️' },
@@ -599,6 +670,8 @@
     const todayList = document.getElementById('todayList');
     const summaryPill = document.getElementById('summaryPill');
     const todayDate = document.getElementById('todayDate');
+    const metricHabits = document.getElementById('metricHabits');
+    const metricCompletion = document.getElementById('metricCompletion');
     const habitForm = document.getElementById('habitForm');
     const formTitle = document.getElementById('formTitle');
     const habitId = document.getElementById('habitId');
@@ -625,9 +698,24 @@
       return new Date().toISOString().slice(0,10);
     }
 
+    function normalizeState(raw){
+      const base = raw && Array.isArray(raw.habits) ? raw : { habits: [] };
+      return {
+        habits: base.habits.map((habit, index) => ({
+          ...habit,
+          order: typeof habit.order === 'number' ? habit.order : index,
+          progress: habit.progress || {}
+        }))
+      };
+    }
+
     function loadState(){
       try{
-        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { habits: [] };
+        const current = localStorage.getItem(STORAGE_KEY);
+        if(current) return normalizeState(JSON.parse(current));
+        const legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
+        if(legacy) return normalizeState(JSON.parse(legacy));
+        return { habits: [] };
       }catch{
         return { habits: [] };
       }
@@ -646,6 +734,16 @@
       });
     }
 
+    function sortedHabits(){
+      return [...state.habits].sort((a,b) => (a.order ?? 0) - (b.order ?? 0));
+    }
+
+    function syncOrderValues(){
+      sortedHabits().forEach((habit, index) => {
+        habit.order = index;
+      });
+    }
+
     function getProgress(habit){
       const done = habit.progress?.[todayKey()]?.length || 0;
       const total = Number(habit.target) || 1;
@@ -653,26 +751,41 @@
       return { done, total, pct };
     }
 
+    function calculateGlobalCompletion(habits){
+      if(!habits.length) return 0;
+      const totalPct = habits.reduce((acc, habit) => {
+        const { done, total } = getProgress(habit);
+        return acc + ((done / total) * 100);
+      }, 0);
+      return Math.round(totalPct / habits.length);
+    }
+
     function ensureHabitProgress(habit){
       if(!habit.progress) habit.progress = {};
       if(!habit.progress[todayKey()]) habit.progress[todayKey()] = [];
     }
 
-    function renderToday(){
-      const habits = state.habits;
+    function updateSummary(habits){
+      metricHabits.textContent = habits.length;
+      metricCompletion.textContent = `${calculateGlobalCompletion(habits)}%`;
       summaryPill.textContent = `${habits.length} ${habits.length === 1 ? 'hábito' : 'hábitos'}`;
+    }
+
+    function renderToday(){
+      const habits = sortedHabits();
+      updateSummary(habits);
       if(!habits.length){
         todayList.innerHTML = `<div class="empty">Ainda não tens hábitos.</div>`;
         return;
       }
 
-      todayList.innerHTML = habits.map(habit => {
+      todayList.innerHTML = habits.map((habit, position) => {
         ensureHabitProgress(habit);
         const c = categories[habit.category] || categories.saude;
         const { done, total, pct } = getProgress(habit);
         const checks = Array.from({length: total}, (_, i) => {
           const on = habit.progress[todayKey()].includes(i);
-          return `<button class="check ${on ? 'on' : ''}" data-id="${habit.id}" data-check="${i}" aria-label="Marcar passo ${i+1}">${on ? '✓' : i+1}</button>`;
+          return `<button class="check ${on ? 'on' : ''}" data-id="${habit.id}" data-check="${i}" aria-label="Marcar passo ${i+1}"></button>`;
         }).join('');
         return `
           <article class="card ${pct === 100 ? 'done' : ''}">
@@ -689,7 +802,9 @@
                 </div>
               </div>
               <div class="card-actions">
+                <button class="mini-btn" data-move="up" data-id="${habit.id}" aria-label="Mover para cima" ${position === 0 ? 'disabled' : ''}>⬆️</button>
                 <button class="mini-btn" data-edit="${habit.id}" aria-label="Editar hábito">✏️</button>
+                <button class="mini-btn" data-move="down" data-id="${habit.id}" aria-label="Mover para baixo" ${position === habits.length - 1 ? 'disabled' : ''}>⬇️</button>
                 <button class="mini-btn" data-delete="${habit.id}" aria-label="Apagar hábito">🗑️</button>
               </div>
             </div>
@@ -765,7 +880,8 @@
         const current = existing.progress[todayKey()] || [];
         existing.progress[todayKey()] = current.filter(i => i < habit.target);
       }else{
-        state.habits.unshift({ ...habit, progress: { [todayKey()]: [] } });
+        syncOrderValues();
+        state.habits.push({ ...habit, order: state.habits.length, progress: { [todayKey()]: [] } });
       }
 
       saveState();
@@ -786,10 +902,26 @@
       if(!habit) return;
       showConfirm('Apagar hábito', `Queres apagar "${habit.name}"?`, () => {
         state.habits = state.habits.filter(h => h.id !== id);
+        syncOrderValues();
         saveState();
         renderToday();
         if(habitId.value === id) resetForm();
       });
+    }
+
+    function moveHabit(id, direction){
+      const ordered = sortedHabits();
+      const index = ordered.findIndex(h => h.id === id);
+      if(index < 0) return;
+      const swapIndex = direction === 'up' ? index - 1 : index + 1;
+      if(swapIndex < 0 || swapIndex >= ordered.length) return;
+      [ordered[index], ordered[swapIndex]] = [ordered[swapIndex], ordered[index]];
+      ordered.forEach((habit, order) => {
+        const original = state.habits.find(h => h.id === habit.id);
+        if(original) original.order = order;
+      });
+      saveState();
+      renderToday();
     }
 
     function toggleCheck(id, index){
@@ -871,9 +1003,11 @@
       todayList.addEventListener('click', (e) => {
         const editId = e.target.closest('[data-edit]')?.dataset.edit;
         const deleteId = e.target.closest('[data-delete]')?.dataset.delete;
+        const moveBtn = e.target.closest('[data-move]');
         const checkBtn = e.target.closest('[data-check]');
         if(editId) editHabit(editId);
         if(deleteId) deleteHabit(deleteId);
+        if(moveBtn) moveHabit(moveBtn.dataset.id, moveBtn.dataset.move);
         if(checkBtn){
           toggleCheck(checkBtn.dataset.id, Number(checkBtn.dataset.check));
         }
