@@ -1,11 +1,12 @@
-const CACHE_NAME = 'mentis-habits-v6';
+const CACHE_NAME = 'mentis-habits-v7';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './sw.js',
   './icon-192.png',
-  './icon-512.png'
+  './icon-512.png',
+  './maskable-icon-512.png'
 ];
 
 self.addEventListener('install', event => {
@@ -33,7 +34,12 @@ self.addEventListener('fetch', event => {
         const copy = response.clone();
         caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
         return response;
-      }).catch(() => caches.match('./index.html'));
+      }).catch(() => {
+        if (event.request.mode === 'navigate') {
+          return caches.match('./index.html');
+        }
+        return cached;
+      });
     })
   );
 });

@@ -249,6 +249,10 @@
     .settings-card{padding:14px;border-radius:22px}
     .setting-line{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid var(--line-soft)}
     .setting-line:last-child{border-bottom:none}
+    .setting-line.stack{display:grid;justify-content:stretch}
+    .setting-copy{display:grid;gap:4px}
+    .setting-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    .status-text{margin-top:12px;color:var(--muted);font-size:.9rem;min-height:1.3em}
     .switch{width:58px;height:34px;border-radius:999px;border:1px solid var(--line-soft);background:rgba(21,49,91,.7);position:relative;cursor:pointer}
     .switch::after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;transition:transform .2s ease}
     body.dark .switch::after{transform:translateX(24px)}
@@ -301,7 +305,7 @@
       </div>
       <div class="top-actions">
         <button class="icon-btn" id="themeToggle" aria-label="Alternar modo claro e escuro">🌙</button>
-        <button class="icon-btn" id="resetDayBtn" aria-label="Reset do dia">🔄</button>
+        <button class="icon-btn" id="resetDayBtn" aria-label="Desmarcar todos os hábitos">🔄</button>
       </div>
     </header>
       <div class="panel">
@@ -413,6 +417,26 @@
               <small style="color:var(--muted)">Os dados ficam guardados neste dispositivo.</small>
             </div>
           </div>
+          <div class="setting-line stack">
+            <div class="setting-copy">
+              <strong>Backup manual</strong>
+              <small style="color:var(--muted)">Exporta ou repõe hábitos, progresso, notas, ordem, categorias e preferências relevantes.</small>
+            </div>
+            <div class="setting-actions">
+              <button class="btn secondary" id="exportBackupBtn" type="button">Exportar backup</button>
+              <button class="btn secondary" id="importBackupBtn" type="button">Importar backup</button>
+            </div>
+            <p class="status-text" id="backupStatus" aria-live="polite"></p>
+          </div>
+          <div class="setting-line stack">
+            <div class="setting-copy">
+              <strong>Progresso manual</strong>
+              <small style="color:var(--muted)">Desmarca apenas os passos concluídos, sem apagar hábitos nem outras definições.</small>
+            </div>
+            <div class="setting-actions">
+              <button class="btn secondary" id="clearChecksBtn" type="button">Desmarcar todos</button>
+            </div>
+          </div>
         </div>
         </div>
       </section>
@@ -436,11 +460,13 @@
       </div>
     </div>
   </div>
+  <input id="backupFileInput" type="file" accept="application/json,.json" hidden />
 
   <script>
     const STORAGE_KEY = 'mentis-habits-data-v2';
     const LEGACY_STORAGE_KEY = 'mentis-habits-data-v1';
     const THEME_KEY = 'mentis-habits-theme';
+    const STORAGE_VERSION = 3;
     const categories = {
       saude: { label: 'Saúde', icon: '❤️' },
       hidratacao: { label: 'Hidratação', icon: '💧' },
@@ -484,40 +510,113 @@
     const themeToggle = document.getElementById('themeToggle');
     const themeSwitch = document.getElementById('themeSwitch');
     const themeLabel = document.getElementById('themeLabel');
+    const exportBackupBtn = document.getElementById('exportBackupBtn');
+    const importBackupBtn = document.getElementById('importBackupBtn');
+    const clearChecksBtn = document.getElementById('clearChecksBtn');
+    const backupStatus = document.getElementById('backupStatus');
+    const backupFileInput = document.getElementById('backupFileInput');
 
-    let state = loadState();
+    let state = loadAppData();
     let pendingConfirm = null;
     let lastCompletedHabitId = null;
 
+    function getLocalDateKey(date = new Date()){
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
     function todayKey(){
-      return new Date().toISOString().slice(0,10);
+      return getLocalDateKey();
+    }
+
+    function sanitizeProgress(progress){
+      if(!progress || typeof progress !== 'object' || Array.isArray(progress)) return {};
+      return Object.entries(progress).reduce((acc, [dateKey, checks]) => {
+        if(typeof dateKey !== 'string') return acc;
+        const cleanChecks = Array.isArray(checks)
+          ? [...new Set(checks.map(Number).filter(Number.isInteger).filter(value => value >= 0))].sort((a,b) => a-b)
+          : [];
+        acc[dateKey] = cleanChecks;
+        return acc;
+      }, {});
     }
 
     function normalizeState(raw){
       const base = raw && Array.isArray(raw.habits) ? raw : { habits: [] };
       return {
+        storageVersion: STORAGE_VERSION,
         habits: base.habits.map((habit, index) => ({
-          ...habit,
+          id: typeof habit.id === 'string' && habit.id ? habit.id : crypto.randomUUID(),
+          name: typeof habit.name === 'string' ? habit.name : '',
+          category: typeof habit.category === 'string' && categories[habit.category] ? habit.category : 'saude',
+          target: Math.max(1, Math.min(20, Number(habit.target) || 1)),
+          time: typeof habit.time === 'string' ? habit.time : '',
+          note: typeof habit.note === 'string' ? habit.note : '',
           order: typeof habit.order === 'number' ? habit.order : index,
-          progress: habit.progress || {}
+          progress: sanitizeProgress(habit.progress)
         }))
       };
     }
 
-    function loadState(){
+    function migrateLegacyData(raw){
+      return normalizeState(raw);
+    }
+
+    function loadAppData(){
       try{
         const current = localStorage.getItem(STORAGE_KEY);
-        if(current) return normalizeState(JSON.parse(current));
+        if(current){
+          const migrated = migrateLegacyData(JSON.parse(current));
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
+          return migrated;
+        }
         const legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
-        if(legacy) return normalizeState(JSON.parse(legacy));
-        return { habits: [] };
+        if(legacy){
+          const migrated = migrateLegacyData(JSON.parse(legacy));
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
+          return migrated;
+        }
+        return normalizeState({ habits: [] });
       }catch{
-        return { habits: [] };
+        return normalizeState({ habits: [] });
       }
     }
 
-    function saveState(){
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    function saveAppData(nextState = state){
+      const normalized = normalizeState(nextState);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
+      state = normalized;
+      return normalized;
+    }
+
+    function buildBackupPayload(appState = state){
+      return {
+        backupVersion: 1,
+        exportedAt: new Date().toISOString(),
+        app: 'Mentis Habits',
+        data: normalizeState(appState),
+        preferences: {
+          theme: localStorage.getItem(THEME_KEY) || 'dark'
+        }
+      };
+    }
+
+    function validateBackupPayload(payload){
+      if(!payload || typeof payload !== 'object') return { ok:false, message:'O ficheiro não contém um backup válido.' };
+      if(Array.isArray(payload.habits)) return { ok:true, data: normalizeState(payload), preferences:{} };
+      if(!payload.data || typeof payload.data !== 'object') return { ok:false, message:'O backup não tem dados reconhecidos.' };
+      return {
+        ok:true,
+        data: normalizeState(payload.data),
+        preferences: payload.preferences && typeof payload.preferences === 'object' ? payload.preferences : {}
+      };
+    }
+
+    function setBackupStatus(message, isError = false){
+      backupStatus.textContent = message;
+      backupStatus.style.color = isError ? 'var(--danger)' : 'var(--muted)';
     }
 
     function formatDate(){
@@ -685,7 +784,7 @@
         state.habits.push({ ...habit, order: state.habits.length, progress: { [todayKey()]: [] } });
       }
 
-      saveState();
+      saveAppData();
       renderToday();
       resetForm();
       openPage('hoje');
@@ -704,7 +803,7 @@
       showConfirm('Apagar hábito', `Queres apagar "${habit.name}"?`, () => {
         state.habits = state.habits.filter(h => h.id !== id);
         syncOrderValues();
-        saveState();
+        saveAppData();
         renderToday();
         if(habitId.value === id) resetForm();
       });
@@ -721,7 +820,7 @@
         const original = state.habits.find(h => h.id === habit.id);
         if(original) original.order = order;
       });
-      saveState();
+      saveAppData();
       renderToday();
     }
 
@@ -741,20 +840,71 @@
       }else{
         lastCompletedHabitId = null;
       }
-      saveState();
+      saveAppData();
       renderToday();
     }
 
-    function resetDay(){
+    function clearAllChecks(){
       if(!state.habits.length) return;
-      showConfirm('Reset do dia', 'Limpar o progresso de todos os hábitos de hoje?', () => {
+      showConfirm('Desmarcar todos', 'Tens a certeza que queres desmarcar todos os hábitos?', () => {
         state.habits.forEach(h => {
           if(!h.progress) h.progress = {};
           h.progress[todayKey()] = [];
         });
-        saveState();
+        saveAppData();
         renderToday();
+        setBackupStatus('Todos os hábitos ficaram desmarcados para hoje.');
       });
+    }
+
+    function downloadBackup(){
+      const payload = buildBackupPayload();
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
+      const fileName = `mentis-habits-backup-${todayKey()}.json`;
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      setBackupStatus(`Backup exportado: ${fileName}`);
+    }
+
+    function importBackupFile(file){
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try{
+          const parsed = JSON.parse(String(reader.result || ''));
+          const validation = validateBackupPayload(parsed);
+          if(!validation.ok){
+            setBackupStatus(validation.message, true);
+            return;
+          }
+          showConfirm('Importar backup', 'Isto vai substituir os dados atuais. Queres continuar?', () => {
+            state = validation.data;
+            saveAppData(state);
+            if(typeof validation.preferences.theme === 'string'){
+              applyTheme(validation.preferences.theme === 'light' ? 'light' : 'dark');
+            }
+            renderToday();
+            resetForm();
+            setBackupStatus('Backup importado com sucesso.');
+            openPage('hoje');
+          });
+        }catch{
+          setBackupStatus('Não foi possível importar: o ficheiro JSON é inválido.', true);
+        }finally{
+          backupFileInput.value = '';
+        }
+      };
+      reader.onerror = () => {
+        setBackupStatus('Não foi possível ler o ficheiro selecionado.', true);
+        backupFileInput.value = '';
+      };
+      reader.readAsText(file);
     }
 
     function showConfirm(title, text, onConfirm){
@@ -807,7 +957,11 @@
       clearFormBtn.addEventListener('click', resetForm);
       themeToggle.addEventListener('click', () => applyTheme(document.body.classList.contains('light') ? 'dark' : 'light'));
       themeSwitch.addEventListener('click', () => applyTheme(document.body.classList.contains('light') ? 'dark' : 'light'));
-      document.getElementById('resetDayBtn').addEventListener('click', resetDay);
+      document.getElementById('resetDayBtn').addEventListener('click', clearAllChecks);
+      clearChecksBtn.addEventListener('click', clearAllChecks);
+      exportBackupBtn.addEventListener('click', downloadBackup);
+      importBackupBtn.addEventListener('click', () => backupFileInput.click());
+      backupFileInput.addEventListener('change', () => importBackupFile(backupFileInput.files?.[0]));
 
       todayList.addEventListener('click', (e) => {
         const editId = e.target.closest('[data-edit]')?.dataset.edit;
