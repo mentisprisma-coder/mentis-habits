@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-PT">
 <head>
   <meta charset="UTF-8" />
@@ -83,7 +83,7 @@
       position:relative;
       padding:12px 14px 96px;
     }
-    .topbar, .panel, .card, form, .settings-card, .empty, .template, .modal{
+    .topbar, .panel, .card, form, .settings-card, .empty, .template, .modal, .history-card{
       background:linear-gradient(180deg,var(--surface),var(--surface-2));
       border:1px solid var(--line-soft);
       box-shadow:var(--shadow);
@@ -95,7 +95,7 @@
       padding:18px 16px 14px;
       border-radius:26px;
       margin-bottom:14px;
-      backdrop-filter: blur(14px);
+      backdrop-filter:blur(14px);
       background:linear-gradient(135deg,#083c4d 0%, #073660 28%, #052b57 62%, #05234a 100%);
       border:1px solid var(--line-soft);
       box-shadow:var(--shadow);
@@ -121,9 +121,14 @@
       border:1px solid var(--line-soft);
       background:rgba(7,31,68,.45);
       color:var(--text);
-      width:46px;height:46px;border-radius:16px;
-      display:grid;place-items:center;font-size:1.12rem;cursor:pointer;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.03);
+      width:46px;
+      height:46px;
+      border-radius:16px;
+      display:grid;
+      place-items:center;
+      font-size:1.12rem;
+      cursor:pointer;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.03);
     }
     body.light .icon-btn{background:var(--surface-3)}
     .page{display:none;padding:0 0 20px;animation:fade .18s ease}
@@ -145,11 +150,32 @@
       border-radius:18px;
       padding:14px 12px;
       min-height:96px;
-      display:flex;flex-direction:column;justify-content:center;gap:8px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap:8px;
     }
     body.light .metric{background:linear-gradient(180deg,var(--surface-2),var(--surface-3))}
     .metric strong{font-size:2rem;letter-spacing:-.05em;line-height:1}
     .metric span{color:var(--muted);font-size:.9rem}
+    .dashboard-progress{
+      margin-top:14px;
+      padding:12px 14px;
+      border-radius:18px;
+      background:rgba(5,24,57,.4);
+      border:1px solid var(--line-soft);
+    }
+    body.light .dashboard-progress{background:rgba(255,255,255,.72)}
+    .dashboard-progress-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:8px;
+      color:var(--muted);
+      font-size:.88rem;
+    }
+    .dashboard-progress-head strong{color:var(--text);font-size:1rem}
 
     .section-shell{
       border-radius:24px;
@@ -160,10 +186,18 @@
       margin-bottom:14px;
     }
     body.light .section-shell{background:linear-gradient(180deg,rgba(255,255,255,.92),rgba(241,247,255,.96))}
+    .create-shell{display:grid;gap:14px}
 
     .section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px}
     .section-title h2{margin:0;font-size:1.15rem;letter-spacing:-.02em}
-    .pill{background:rgba(21,49,91,.7);color:var(--muted);border:1px solid var(--line-soft);padding:8px 12px;border-radius:999px;font-size:.82rem}
+    .pill{
+      background:rgba(21,49,91,.7);
+      color:var(--muted);
+      border:1px solid var(--line-soft);
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:.82rem;
+    }
     body.light .pill{background:var(--surface-2)}
 
     .card{
@@ -179,27 +213,55 @@
       border-color:rgba(37,205,152,.35);
       box-shadow:0 18px 34px rgba(2,17,36,.35), inset 0 0 0 1px rgba(33,227,164,.14);
     }
-    .card.just-done{
-      animation:popDone .32s ease;
-    }
+    .card.just-done{animation:popDone .32s ease}
     body.light .card.done{background:linear-gradient(180deg,#e8faf2,#dff7ef)}
     @keyframes popDone{0%{transform:scale(.987)}60%{transform:scale(1.01)}100%{transform:scale(1)}}
     .habit-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
     .habit-main{display:flex;gap:12px;min-width:0;flex:1}
     .habit-icon{
-      width:32px;height:32px;border-radius:10px;display:grid;place-items:center;
-      background:rgba(24,57,104,.58);border:1px solid var(--line-soft);font-size:1rem;flex:none;margin-top:2px;
+      width:32px;
+      height:32px;
+      border-radius:10px;
+      display:grid;
+      place-items:center;
+      background:rgba(24,57,104,.58);
+      border:1px solid var(--line-soft);
+      font-size:1rem;
+      flex:none;
+      margin-top:2px;
     }
     body.light .habit-icon{background:var(--surface-2)}
-    .habit-name{margin:0 0 6px;font-size:1.18rem;line-height:1.2;word-break:break-word}
+    .habit-title{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 6px}
+    .habit-name{margin:0;font-size:1.18rem;line-height:1.2;word-break:break-word}
+    .habit-note-tag{
+      display:inline-flex;
+      align-items:center;
+      max-width:100%;
+      padding:4px 10px;
+      border-radius:999px;
+      border:1px solid var(--line-soft);
+      background:rgba(21,49,91,.54);
+      color:var(--muted);
+      font-size:.8rem;
+      line-height:1.2;
+    }
+    body.light .habit-note-tag{background:var(--surface-2)}
     .meta{display:flex;flex-wrap:wrap;gap:8px;color:var(--muted);font-size:.83rem}
     .meta span{background:rgba(21,49,91,.54);border:1px solid var(--line-soft);padding:6px 10px;border-radius:999px}
     body.light .meta span{background:var(--surface-2)}
     .card-actions{display:flex;align-items:center;gap:8px;flex:none}
     .move-actions{display:grid;grid-template-columns:repeat(2,40px);gap:8px}
     .mini-btn{
-      width:40px;height:40px;border-radius:12px;border:1px solid var(--line-soft);
-      background:rgba(8,30,64,.72);color:var(--text);display:grid;place-items:center;cursor:pointer;font-size:1rem;
+      width:40px;
+      height:40px;
+      border-radius:12px;
+      border:1px solid var(--line-soft);
+      background:rgba(8,30,64,.72);
+      color:var(--text);
+      display:grid;
+      place-items:center;
+      cursor:pointer;
+      font-size:1rem;
     }
     body.light .mini-btn{background:var(--surface-3)}
     .mini-btn:disabled{opacity:.4;cursor:not-allowed}
@@ -207,29 +269,71 @@
     .progress-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;font-size:.84rem;color:var(--muted)}
     .progress-head strong{color:#dff8f4;font-size:1rem}
     body.light .progress-head strong{color:#11635f}
-    .progress{width:100%;height:10px;background:rgba(255,255,255,.08);border:1px solid var(--line-soft);border-radius:999px;overflow:hidden}
+    .progress{
+      width:100%;
+      height:10px;
+      background:rgba(255,255,255,.08);
+      border:1px solid var(--line-soft);
+      border-radius:999px;
+      overflow:hidden;
+    }
     body.light .progress{background:#e8f1fc}
-    .progress > div{height:100%;width:0;background:linear-gradient(90deg,var(--primary-2),var(--primary));border-radius:999px;transition:width .2s ease}
+    .progress > div{
+      height:100%;
+      width:0;
+      background:linear-gradient(90deg,var(--primary-2),var(--primary));
+      border-radius:999px;
+      transition:width .2s ease;
+    }
     .checklist{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
     .check{
-      width:32px;height:32px;border-radius:10px;border:1px solid var(--line);
-      background:rgba(7,33,73,.8);cursor:pointer;display:grid;place-items:center;
-      transition:all .18s ease;position:relative;padding:0;
+      width:32px;
+      height:32px;
+      border-radius:10px;
+      border:1px solid var(--line);
+      background:rgba(7,33,73,.8);
+      cursor:pointer;
+      display:grid;
+      place-items:center;
+      transition:all .18s ease;
+      position:relative;
+      padding:0;
     }
     body.light .check{background:var(--surface-3)}
-    .check::before{content:"";width:16px;height:16px;border-radius:4px;border:2px solid rgba(159,176,200,.9);transition:all .18s ease;background:transparent}
+    .check::before{
+      content:"";
+      width:16px;
+      height:16px;
+      border-radius:4px;
+      border:2px solid rgba(159,176,200,.9);
+      transition:all .18s ease;
+      background:transparent;
+    }
     .check.on{background:var(--primary-soft);border-color:rgba(40,213,195,.18);transform:translateY(-1px)}
-    .check.on::before{border:none;background:linear-gradient(180deg,var(--primary-2),var(--primary));content:"✓";display:grid;place-items:center;color:#fff;font-size:.78rem;font-weight:900}
-    .note{margin-top:12px;padding:11px 12px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid var(--line-soft);color:var(--text);font-size:.9rem;white-space:pre-wrap;word-break:break-word}
-    body.light .note{background:var(--surface-2)}
+    .check.on::before{
+      border:none;
+      background:linear-gradient(180deg,var(--primary-2),var(--primary));
+      content:"✓";
+      display:grid;
+      place-items:center;
+      color:#fff;
+      font-size:.78rem;
+      font-weight:900;
+    }
     .empty{text-align:center;padding:36px 18px;border:1px dashed var(--line);border-radius:22px;color:var(--muted)}
 
     form{display:grid;gap:12px;padding:14px;border-radius:22px}
-    .field{display:grid; gap:7px}
+    .field{display:grid;gap:7px}
     label{font-size:.92rem;color:var(--muted);font-weight:600}
     input,select,textarea{
-      width:100%;padding:13px 14px;border-radius:16px;border:1px solid var(--line-soft);
-      background:rgba(7,31,68,.58);color:var(--text);font:inherit;outline:none;
+      width:100%;
+      padding:13px 14px;
+      border-radius:16px;
+      border:1px solid var(--line-soft);
+      background:rgba(7,31,68,.58);
+      color:var(--text);
+      font:inherit;
+      outline:none;
     }
     body.light input, body.light select, body.light textarea{background:var(--surface-3)}
     input::placeholder, textarea::placeholder{color:var(--muted)}
@@ -246,6 +350,19 @@
     .template span{display:block;font-weight:700}
     .template small{display:block;color:var(--muted);margin-top:4px}
 
+    .history-list{display:grid;gap:12px}
+    .history-card{padding:14px;border-radius:20px}
+    .history-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+    .history-head h3{margin:0;font-size:1rem}
+    .history-meta{display:flex;gap:8px;flex-wrap:wrap;color:var(--muted);font-size:.84rem}
+    .history-meta span{
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--line-soft);
+      background:rgba(21,49,91,.54);
+    }
+    body.light .history-meta span{background:var(--surface-2)}
+
     .settings-card{padding:14px;border-radius:22px}
     .setting-line{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid var(--line-soft)}
     .setting-line:last-child{border-bottom:none}
@@ -253,14 +370,44 @@
     .setting-copy{display:grid;gap:4px}
     .setting-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
     .status-text{margin-top:12px;color:var(--muted);font-size:.9rem;min-height:1.3em}
-    .switch{width:58px;height:34px;border-radius:999px;border:1px solid var(--line-soft);background:rgba(21,49,91,.7);position:relative;cursor:pointer}
-    .switch::after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;transition:transform .2s ease}
+    .switch{
+      width:58px;
+      height:34px;
+      border-radius:999px;
+      border:1px solid var(--line-soft);
+      background:rgba(21,49,91,.7);
+      position:relative;
+      cursor:pointer;
+    }
+    .switch::after{
+      content:"";
+      position:absolute;
+      top:3px;
+      left:3px;
+      width:26px;
+      height:26px;
+      border-radius:50%;
+      background:#fff;
+      transition:transform .2s ease;
+    }
     body.dark .switch::after{transform:translateX(24px)}
 
     .bottom-nav{
-      position:fixed;left:50%;transform:translateX(-50%);bottom:max(10px, env(safe-area-inset-bottom));z-index:30;
-      width:min(820px, calc(100vw - 20px));display:grid;grid-template-columns:repeat(4,1fr);gap:8px;
-      padding:10px;border-radius:22px;background:var(--nav);backdrop-filter:blur(14px);border:1px solid var(--line-soft);box-shadow:var(--shadow);
+      position:fixed;
+      left:50%;
+      transform:translateX(-50%);
+      bottom:max(10px, env(safe-area-inset-bottom));
+      z-index:30;
+      width:min(820px, calc(100vw - 20px));
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:8px;
+      padding:10px;
+      border-radius:22px;
+      background:var(--nav);
+      backdrop-filter:blur(14px);
+      border:1px solid var(--line-soft);
+      box-shadow:var(--shadow);
     }
     .nav-btn{border:none;background:transparent;color:var(--muted);padding:10px 8px;border-radius:16px;display:grid;gap:4px;place-items:center;cursor:pointer}
     .nav-btn strong{font-size:.8rem;font-weight:700}
@@ -268,10 +415,16 @@
     .nav-btn.active{background:rgba(16,62,100,.72);color:var(--text)}
     body.light .nav-btn.active{background:var(--surface-2)}
 
-    dialog{border:none;border-radius:20px;padding:0;background:transparent;max-width:min(92vw,420px)}
     .modal-backdrop{
-      position:fixed;inset:0;display:none;align-items:flex-end;justify-content:center;
-      padding:16px;z-index:60;background:rgba(2,8,20,.52);backdrop-filter:blur(6px);
+      position:fixed;
+      inset:0;
+      display:none;
+      align-items:flex-end;
+      justify-content:center;
+      padding:16px;
+      z-index:60;
+      background:rgba(2,8,20,.52);
+      backdrop-filter:blur(6px);
     }
     .modal-backdrop.open{display:flex}
     .modal{padding:18px;border-radius:22px;width:min(100%,420px)}
@@ -293,151 +446,168 @@
       .metric{min-height:84px;padding:12px 10px}
       .metric strong{font-size:1.55rem}
       .bottom-nav{width:calc(100vw - 12px);padding:8px}
+      .dashboard-progress{padding:10px 12px}
     }
-</style>
+  </style>
 </head>
 <body class="dark">
   <div class="app">
-    <section class="hero-panel"><header class="topbar">
-      <div class="brand">
-        <h1>Mentis Habits</h1>
-        <small id="todayDate"></small>
-      </div>
-      <div class="top-actions">
-        <button class="icon-btn" id="themeToggle" aria-label="Alternar modo claro e escuro">🌙</button>
-        <button class="icon-btn" id="resetDayBtn" aria-label="Desmarcar todos os hábitos">🔄</button>
-      </div>
-    </header>
-      <div class="panel">
-        <div class="summary-box">
-          <div class="metric">
-            <strong id="metricHabits">0</strong>
-            <span>Hábitos criados</span>
-          </div>
-          <div class="metric">
-            <strong id="metricDoneToday">0</strong>
-            <span>Concluídos hoje</span>
-          </div>
-          <div class="metric">
-            <strong id="metricCompletion">0%</strong>
-            <span>Conclusão do dia</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <main>
       <section class="page active" id="page-hoje">
+        <section class="hero-panel">
+          <header class="topbar">
+            <div class="brand">
+              <h1>Mentis Habits</h1>
+              <small id="todayDate"></small>
+            </div>
+            <div class="top-actions">
+              <button class="icon-btn" id="themeToggle" aria-label="Alternar modo claro e escuro">🌙</button>
+              <button class="icon-btn" id="resetDayBtn" aria-label="Desmarcar todos os hábitos">🔄</button>
+            </div>
+          </header>
+          <div class="panel">
+            <div class="summary-box">
+              <div class="metric">
+                <strong id="metricHabits">0</strong>
+                <span>Hábitos criados</span>
+              </div>
+              <div class="metric">
+                <strong id="metricDoneToday">0</strong>
+                <span>Concluídos hoje</span>
+              </div>
+              <div class="metric">
+                <strong id="metricCompletion">0%</strong>
+                <span>Conclusão do dia</span>
+              </div>
+            </div>
+            <div class="dashboard-progress">
+              <div class="dashboard-progress-head">
+                <span>Progresso global do dia</span>
+                <strong id="dashboardProgressValue">0%</strong>
+              </div>
+              <div class="progress"><div id="dashboardProgressBar" style="width:0%"></div></div>
+            </div>
+          </div>
+        </section>
+
         <div class="section-shell">
-        <div class="section-title">
-          <h2>Hoje</h2>
-          <div class="pill" id="summaryPill">0 hábitos</div>
-        </div>
-        <div id="todayList"></div>
+          <div class="section-title">
+            <h2>Hoje</h2>
+            <div class="pill" id="summaryPill">0 hábitos</div>
+          </div>
+          <div id="todayList"></div>
         </div>
       </section>
-
       <section class="page" id="page-criar">
-        <div class="section-shell">
-        <div class="section-title">
-          <h2 id="formTitle">Criar hábito</h2>
-        </div>
-        <form id="habitForm">
-          <input type="hidden" id="habitId" />
-          <div class="field">
-            <label for="habitName">Nome</label>
-            <input id="habitName" maxlength="60" placeholder="Ex.: Beber água" required />
-          </div>
-          <div class="field">
-            <label for="habitCategory">Categoria</label>
-            <select id="habitCategory" required>
-              <option value="saude">❤️ Saúde</option>
-              <option value="hidratacao">💧 Hidratação</option>
-              <option value="exercicio">🏋️ Exercício</option>
-              <option value="estudo">📚 Estudo</option>
-              <option value="mental">🧠 Mental</option>
-              <option value="financas">💰 Finanças</option>
-              <option value="sono">🌙 Sono</option>
-            </select>
-          </div>
-          <div class="row-2">
-            <div class="field">
-              <label for="habitTarget">Quantidade diária</label>
-              <input id="habitTarget" type="number" min="1" max="20" value="1" required />
+        <div class="create-shell">
+          <div class="section-shell">
+            <div class="section-title">
+              <h2>Modelos</h2>
             </div>
-            <div class="field">
-              <label for="habitTime">Horário</label>
-              <input id="habitTime" type="time" />
+            <div class="templates" id="templatesList"></div>
+          </div>
+
+          <div class="section-shell">
+            <div class="section-title">
+              <h2 id="formTitle">Criar hábito</h2>
             </div>
+            <form id="habitForm">
+              <input type="hidden" id="habitId" />
+              <div class="field">
+                <label for="habitName">Nome</label>
+                <input id="habitName" maxlength="60" placeholder="Ex.: Beber água" required />
+              </div>
+              <div class="field">
+                <label for="habitCategory">Categoria</label>
+                <select id="habitCategory" required>
+                  <option value="saude">❤️ Saúde</option>
+                  <option value="hidratacao">💧 Hidratação</option>
+                  <option value="exercicio">🏋️ Exercício</option>
+                  <option value="estudo">📚 Estudo</option>
+                  <option value="mental">🧠 Mental</option>
+                  <option value="financas">💰 Finanças</option>
+                  <option value="sono">🌙 Sono</option>
+                </select>
+              </div>
+              <div class="row-2">
+                <div class="field">
+                  <label for="habitTarget">Quantidade diária</label>
+                  <input id="habitTarget" type="number" min="1" max="20" value="1" required />
+                </div>
+                <div class="field">
+                  <label for="habitTime">Horário</label>
+                  <input id="habitTime" type="time" />
+                </div>
+              </div>
+              <div class="field">
+                <label for="habitNote">Nota</label>
+                <textarea id="habitNote" maxlength="240" placeholder="Opcional"></textarea>
+              </div>
+              <div class="submit-row">
+                <button type="submit" class="btn primary" id="saveBtn">Guardar</button>
+                <button type="button" class="btn secondary" id="clearFormBtn">Limpar</button>
+              </div>
+            </form>
           </div>
-          <div class="field">
-            <label for="habitNote">Nota</label>
-            <textarea id="habitNote" maxlength="240" placeholder="Opcional"></textarea>
-          </div>
-          <div class="submit-row">
-            <button type="submit" class="btn primary" id="saveBtn">Guardar</button>
-            <button type="button" class="btn secondary" id="clearFormBtn">Limpar</button>
-          </div>
-        </form>
         </div>
       </section>
 
-      <section class="page" id="page-modelos">
+      <section class="page" id="page-historico">
         <div class="section-shell">
-        <div class="section-title">
-          <h2>Modelos</h2>
-        </div>
-        <div class="templates" id="templatesList"></div>
+          <div class="section-title">
+            <h2>Histórico</h2>
+          </div>
+          <div class="history-list" id="historyList"></div>
         </div>
       </section>
 
       <section class="page" id="page-definicoes">
         <div class="section-shell">
-        <div class="section-title">
-          <h2>Definições</h2>
-        </div>
-        <div class="settings-card">
-          <div class="setting-line">
-            <div>
-              <strong>Modo</strong><br />
-              <small id="themeLabel" style="color:var(--muted)">Claro</small>
-            </div>
-            <button class="switch" id="themeSwitch" aria-label="Alternar tema"></button>
+          <div class="section-title">
+            <h2>Definições</h2>
           </div>
-          <div class="setting-line">
-            <div>
-              <strong>App</strong><br />
-              <small style="color:var(--muted)">Mentis Habits · PWA</small>
+          <div class="settings-card">
+            <div class="setting-line">
+              <div>
+                <strong>Modo</strong><br />
+                <small id="themeLabel" style="color:var(--muted)">Claro</small>
+              </div>
+              <button class="switch" id="themeSwitch" aria-label="Alternar tema"></button>
             </div>
-            <span class="pill">v1.5</span>
+            <div class="setting-line">
+              <div>
+                <strong>App</strong><br />
+                <small style="color:var(--muted)">Mentis Habits · PWA</small>
+              </div>
+              <span class="pill">v1.6</span>
+            </div>
+            <div class="setting-line">
+              <div>
+                <strong>Utilização</strong><br />
+                <small style="color:var(--muted)">Os dados ficam guardados neste dispositivo.</small>
+              </div>
+            </div>
+            <div class="setting-line stack">
+              <div class="setting-copy">
+                <strong>Backup manual</strong>
+                <small style="color:var(--muted)">Exporta ou repõe hábitos, progresso, notas, ordem, categorias e preferências relevantes.</small>
+              </div>
+              <div class="setting-actions">
+                <button class="btn secondary" id="exportBackupBtn" type="button">Exportar backup</button>
+                <button class="btn secondary" id="importBackupBtn" type="button">Importar backup</button>
+              </div>
+              <p class="status-text" id="backupStatus" aria-live="polite"></p>
+            </div>
+            <div class="setting-line stack">
+              <div class="setting-copy">
+                <strong>Progresso manual</strong>
+                <small style="color:var(--muted)">Desmarca apenas os passos concluídos, sem apagar hábitos nem outras definições.</small>
+              </div>
+              <div class="setting-actions">
+                <button class="btn secondary" id="clearChecksBtn" type="button">Desmarcar todos</button>
+              </div>
+            </div>
           </div>
-          <div class="setting-line">
-            <div>
-              <strong>Utilização</strong><br />
-              <small style="color:var(--muted)">Os dados ficam guardados neste dispositivo.</small>
-            </div>
-          </div>
-          <div class="setting-line stack">
-            <div class="setting-copy">
-              <strong>Backup manual</strong>
-              <small style="color:var(--muted)">Exporta ou repõe hábitos, progresso, notas, ordem, categorias e preferências relevantes.</small>
-            </div>
-            <div class="setting-actions">
-              <button class="btn secondary" id="exportBackupBtn" type="button">Exportar backup</button>
-              <button class="btn secondary" id="importBackupBtn" type="button">Importar backup</button>
-            </div>
-            <p class="status-text" id="backupStatus" aria-live="polite"></p>
-          </div>
-          <div class="setting-line stack">
-            <div class="setting-copy">
-              <strong>Progresso manual</strong>
-              <small style="color:var(--muted)">Desmarca apenas os passos concluídos, sem apagar hábitos nem outras definições.</small>
-            </div>
-            <div class="setting-actions">
-              <button class="btn secondary" id="clearChecksBtn" type="button">Desmarcar todos</button>
-            </div>
-          </div>
-        </div>
         </div>
       </section>
     </main>
@@ -445,7 +615,7 @@
     <nav class="bottom-nav" aria-label="Navegação principal">
       <button class="nav-btn active" data-page="hoje"><span class="ico">✅</span><strong>Hoje</strong></button>
       <button class="nav-btn" data-page="criar"><span class="ico">➕</span><strong>Criar</strong></button>
-      <button class="nav-btn" data-page="modelos"><span class="ico">🧩</span><strong>Modelos</strong></button>
+      <button class="nav-btn" data-page="historico"><span class="ico">🕘</span><strong>Histórico</strong></button>
       <button class="nav-btn" data-page="definicoes"><span class="ico">⚙️</span><strong>Definições</strong></button>
     </nav>
   </div>
@@ -467,6 +637,7 @@
     const LEGACY_STORAGE_KEY = 'mentis-habits-data-v1';
     const THEME_KEY = 'mentis-habits-theme';
     const STORAGE_VERSION = 3;
+
     const categories = {
       saude: { label: 'Saúde', icon: '❤️' },
       hidratacao: { label: 'Hidratação', icon: '💧' },
@@ -487,11 +658,14 @@
     ];
 
     const todayList = document.getElementById('todayList');
+    const historyList = document.getElementById('historyList');
     const summaryPill = document.getElementById('summaryPill');
     const todayDate = document.getElementById('todayDate');
     const metricHabits = document.getElementById('metricHabits');
     const metricDoneToday = document.getElementById('metricDoneToday');
     const metricCompletion = document.getElementById('metricCompletion');
+    const dashboardProgressValue = document.getElementById('dashboardProgressValue');
+    const dashboardProgressBar = document.getElementById('dashboardProgressBar');
     const habitForm = document.getElementById('habitForm');
     const formTitle = document.getElementById('formTitle');
     const habitId = document.getElementById('habitId');
@@ -590,7 +764,6 @@
       state = normalized;
       return normalized;
     }
-
     function buildBackupPayload(appState = state){
       return {
         backupVersion: 1,
@@ -598,15 +771,22 @@
         app: 'Mentis Habits',
         data: normalizeState(appState),
         preferences: {
-          theme: localStorage.getItem(THEME_KEY) || 'dark'
+          theme: localStorage.getItem(THEME_KEY) || 'dark',
+          templates
         }
       };
     }
 
     function validateBackupPayload(payload){
-      if(!payload || typeof payload !== 'object') return { ok:false, message:'O ficheiro não contém um backup válido.' };
-      if(Array.isArray(payload.habits)) return { ok:true, data: normalizeState(payload), preferences:{} };
-      if(!payload.data || typeof payload.data !== 'object') return { ok:false, message:'O backup não tem dados reconhecidos.' };
+      if(!payload || typeof payload !== 'object'){
+        return { ok:false, message:'O ficheiro não contém um backup válido.' };
+      }
+      if(Array.isArray(payload.habits)){
+        return { ok:true, data: normalizeState(payload), preferences:{} };
+      }
+      if(!payload.data || typeof payload.data !== 'object'){
+        return { ok:false, message:'O backup não tem dados reconhecidos.' };
+      }
       return {
         ok:true,
         data: normalizeState(payload.data),
@@ -628,6 +808,16 @@
       });
     }
 
+    function formatDateLabel(dateKey){
+      const [year, month, day] = dateKey.split('-').map(Number);
+      const date = new Date(year, (month || 1) - 1, day || 1);
+      return date.toLocaleDateString('pt-PT', {
+        weekday:'long',
+        day:'2-digit',
+        month:'long'
+      });
+    }
+
     function sortedHabits(){
       return [...state.habits].sort((a,b) => (a.order ?? 0) - (b.order ?? 0));
     }
@@ -638,20 +828,28 @@
       });
     }
 
-    function getProgress(habit){
-      const done = habit.progress?.[todayKey()]?.length || 0;
+    function getProgressForDate(habit, dateKey){
+      const done = habit.progress?.[dateKey]?.length || 0;
       const total = Number(habit.target) || 1;
       const pct = Math.round((done / total) * 100);
       return { done, total, pct };
     }
 
-    function calculateGlobalCompletion(habits){
+    function getProgress(habit){
+      return getProgressForDate(habit, todayKey());
+    }
+
+    function calculateGlobalCompletionForDate(habits, dateKey){
       if(!habits.length) return 0;
       const totalPct = habits.reduce((acc, habit) => {
-        const { done, total } = getProgress(habit);
+        const { done, total } = getProgressForDate(habit, dateKey);
         return acc + ((done / total) * 100);
       }, 0);
       return Math.round(totalPct / habits.length);
+    }
+
+    function calculateGlobalCompletion(habits){
+      return calculateGlobalCompletionForDate(habits, todayKey());
     }
 
     function ensureHabitProgress(habit){
@@ -662,8 +860,11 @@
     function updateSummary(habits){
       metricHabits.textContent = habits.length;
       const completed = habits.filter(h => getProgress(h).pct === 100).length;
+      const globalPct = calculateGlobalCompletion(habits);
       metricDoneToday.textContent = completed;
-      metricCompletion.textContent = `${calculateGlobalCompletion(habits)}%`;
+      metricCompletion.textContent = `${globalPct}%`;
+      dashboardProgressValue.textContent = `${globalPct}%`;
+      dashboardProgressBar.style.width = `${globalPct}%`;
       summaryPill.textContent = `${habits.length} ${habits.length === 1 ? 'hábito' : 'hábitos'}`;
     }
 
@@ -682,7 +883,7 @@
         const justDone = habit.id === lastCompletedHabitId && pct === 100;
         const checks = Array.from({length: total}, (_, i) => {
           const on = habit.progress[todayKey()].includes(i);
-          return `<button class="check ${on ? 'on' : ''}" data-id="${habit.id}" data-check="${i}" aria-label="Marcar passo ${i+1}"></button>`;
+          return `<button class="check ${on ? 'on' : ''}" data-id="${habit.id}" data-check="${i}" aria-label="Marcar passo ${i + 1}"></button>`;
         }).join('');
         return `
           <article class="card ${pct === 100 ? 'done' : ''} ${justDone ? 'just-done' : ''}">
@@ -690,7 +891,10 @@
               <div class="habit-main">
                 <div class="habit-icon">${c.icon}</div>
                 <div style="min-width:0;flex:1">
-                  <h3 class="habit-name">${escapeHtml(habit.name)}</h3>
+                  <div class="habit-title">
+                    <h3 class="habit-name">${escapeHtml(habit.name)}</h3>
+                    ${habit.note ? `<span class="habit-note-tag">${escapeHtml(habit.note)}</span>` : ''}
+                  </div>
                   <div class="meta">
                     <span>${c.label}</span>
                     ${habit.time ? `<span>⏰ ${habit.time}</span>` : ''}
@@ -715,11 +919,40 @@
               <div class="progress"><div style="width:${pct}%"></div></div>
             </div>
             <div class="checklist">${checks}</div>
-            ${habit.note ? `<div class="note">${escapeHtml(habit.note)}</div>` : ''}
           </article>
         `;
       }).join('');
       lastCompletedHabitId = null;
+    }
+
+    function renderHistory(){
+      const habits = sortedHabits();
+      const dateKeys = [...new Set(habits.flatMap(habit => Object.keys(habit.progress || {})))].sort().reverse();
+      if(!dateKeys.length){
+        historyList.innerHTML = `<div class="empty">Ainda não existe histórico guardado.</div>`;
+        return;
+      }
+
+      historyList.innerHTML = dateKeys.map(dateKey => {
+        const completed = habits.filter(habit => getProgressForDate(habit, dateKey).pct === 100).length;
+        const globalPct = calculateGlobalCompletionForDate(habits, dateKey);
+        const label = dateKey === todayKey() ? 'Hoje' : formatDateLabel(dateKey);
+        return `
+          <article class="history-card">
+            <div class="history-head">
+              <h3>${escapeHtml(label)}</h3>
+              <span class="pill">${globalPct}%</span>
+            </div>
+            <div class="history-meta">
+              <span>${dateKey}</span>
+              <span>${completed}/${habits.length} hábitos concluídos</span>
+            </div>
+            <div class="progress-wrap">
+              <div class="progress"><div style="width:${globalPct}%"></div></div>
+            </div>
+          </article>
+        `;
+      }).join('');
     }
 
     function renderTemplates(){
@@ -737,6 +970,7 @@
     function openPage(page){
       document.querySelectorAll('.page').forEach(el => el.classList.toggle('active', el.id === `page-${page}`));
       document.querySelectorAll('.nav-btn').forEach(el => el.classList.toggle('active', el.dataset.page === page));
+      if(page === 'historico') renderHistory();
     }
 
     function resetForm(){
@@ -756,7 +990,6 @@
       habitNote.value = data.note || '';
       formTitle.textContent = data.id ? 'Editar hábito' : 'Criar hábito';
     }
-
     function saveHabit(e){
       e.preventDefault();
       const habit = {
@@ -786,6 +1019,7 @@
 
       saveAppData();
       renderToday();
+      renderHistory();
       resetForm();
       openPage('hoje');
     }
@@ -805,6 +1039,7 @@
         syncOrderValues();
         saveAppData();
         renderToday();
+        renderHistory();
         if(habitId.value === id) resetForm();
       });
     }
@@ -822,6 +1057,7 @@
       });
       saveAppData();
       renderToday();
+      renderHistory();
     }
 
     function toggleCheck(id, index){
@@ -833,26 +1069,24 @@
       const pos = arr.indexOf(index);
       if(pos >= 0) arr.splice(pos, 1);
       else arr.push(index);
-      arr.sort((a,b) => a-b);
+      arr.sort((a,b) => a - b);
       const after = getProgress(habit).pct;
-      if(before < 100 && after === 100){
-        lastCompletedHabitId = id;
-      }else{
-        lastCompletedHabitId = null;
-      }
+      lastCompletedHabitId = before < 100 && after === 100 ? id : null;
       saveAppData();
       renderToday();
+      renderHistory();
     }
 
     function clearAllChecks(){
       if(!state.habits.length) return;
       showConfirm('Desmarcar todos', 'Tens a certeza que queres desmarcar todos os hábitos?', () => {
-        state.habits.forEach(h => {
-          if(!h.progress) h.progress = {};
-          h.progress[todayKey()] = [];
+        state.habits.forEach(habit => {
+          if(!habit.progress) habit.progress = {};
+          habit.progress[todayKey()] = [];
         });
         saveAppData();
         renderToday();
+        renderHistory();
         setBackupStatus('Todos os hábitos ficaram desmarcados para hoje.');
       });
     }
@@ -890,6 +1124,7 @@
               applyTheme(validation.preferences.theme === 'light' ? 'light' : 'dark');
             }
             renderToday();
+            renderHistory();
             resetForm();
             setBackupStatus('Backup importado com sucesso.');
             openPage('hoje');
@@ -921,7 +1156,7 @@
       modalBackdrop.setAttribute('aria-hidden', 'true');
     }
 
-    function escapeHtml(str=''){
+    function escapeHtml(str = ''){
       return str
         .replaceAll('&','&amp;')
         .replaceAll('<','&lt;')
@@ -944,15 +1179,13 @@
 
     function initTheme(){
       const saved = localStorage.getItem(THEME_KEY);
-      const theme = saved || 'dark';
-      applyTheme(theme);
+      applyTheme(saved || 'dark');
     }
 
     function registerEvents(){
       document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.addEventListener('click', () => openPage(btn.dataset.page));
       });
-
       habitForm.addEventListener('submit', saveHabit);
       clearFormBtn.addEventListener('click', resetForm);
       themeToggle.addEventListener('click', () => applyTheme(document.body.classList.contains('light') ? 'dark' : 'light'));
@@ -963,7 +1196,7 @@
       importBackupBtn.addEventListener('click', () => backupFileInput.click());
       backupFileInput.addEventListener('change', () => importBackupFile(backupFileInput.files?.[0]));
 
-      todayList.addEventListener('click', (e) => {
+      todayList.addEventListener('click', e => {
         const editId = e.target.closest('[data-edit]')?.dataset.edit;
         const deleteId = e.target.closest('[data-delete]')?.dataset.delete;
         const moveBtn = e.target.closest('[data-move]');
@@ -971,12 +1204,10 @@
         if(editId) editHabit(editId);
         if(deleteId) deleteHabit(deleteId);
         if(moveBtn) moveHabit(moveBtn.dataset.id, moveBtn.dataset.move);
-        if(checkBtn){
-          toggleCheck(checkBtn.dataset.id, Number(checkBtn.dataset.check));
-        }
+        if(checkBtn) toggleCheck(checkBtn.dataset.id, Number(checkBtn.dataset.check));
       });
 
-      templatesList.addEventListener('click', (e) => {
+      templatesList.addEventListener('click', e => {
         const btn = e.target.closest('[data-template]');
         if(!btn) return;
         const tpl = templates[Number(btn.dataset.template)];
@@ -990,7 +1221,7 @@
         if(pendingConfirm) pendingConfirm();
         closeConfirm();
       });
-      modalBackdrop.addEventListener('click', (e) => {
+      modalBackdrop.addEventListener('click', e => {
         if(e.target === modalBackdrop) closeConfirm();
       });
     }
@@ -1007,6 +1238,7 @@
     initTheme();
     renderTemplates();
     renderToday();
+    renderHistory();
     resetForm();
     registerEvents();
     registerSW();
